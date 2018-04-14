@@ -13,6 +13,12 @@ const oauth2Client = new google.auth.OAuth2(
     secret.web.redirect_uris[0]
   );
 
+  google.options({
+      timeout: 10000,
+      auth: secret.api_key
+  })
+  const googleChat = google.chat.spaces
+  console.log('GOOGLECHAT', google.chat());
   // generate a url that asks permissions for Google+ and Google Calendar scopes
   const scopes = [
     'https://www.googleapis.com/auth/plus.me',
@@ -48,7 +54,10 @@ Routes
         .then(data => {
             tokens = data.tokens;
             oauth2Client.setCredentials(tokens);
-            urlShortener();
+            return axiosGetSpaces();
+        })
+        .then(_ => {
+            res.send('Complete...')
         })
         .catch(err => {
             console.error('ERROR /redirect', err);
@@ -57,23 +66,12 @@ Routes
     
   })
 
-
-  function urlShortener() {
-    const urlshortener = google.urlshortener({
-        version: 'v1',
-        auth: secret.api_key
-      });
-      
-      const params = {
-        shortUrl: 'http://goo.gl/xKbRu3'
-      };
-      
-      // get the long url of a shortened url
-      urlshortener.url.get(params, (err, res) => {
-        if (err) {
-          console.error(err);
-          throw err;
-        }
-        console.log(`Long url is ${res.data.longUrl}`);
-      });
-  }
+function axiosGetSpaces () {
+    // return googleChat.list({})
+    //     .then(res => {
+    //         console.log('Response', res)
+    //     })
+    //     .catch(err => {
+    //         console.error('ERROR axiosGetSpaces', err)
+    //     }) 
+}
